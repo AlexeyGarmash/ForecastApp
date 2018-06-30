@@ -1,5 +1,6 @@
 package com.example.alex.gismasterapp.activities;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -64,12 +65,14 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        setAutoCompleteFragment();
 
         mRecyclerView = findViewById(R.id.rvHistory);
         mTextViewListEmpty = findViewById(R.id.tvListEmpty);
@@ -96,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
         mAppWeatherService = ServiceUtils.getService("http://192.168.1.106:3000");
 
-        setAutoCompleteFragment();
+
         //new DownloadCities().execute();
         setRefreshLayout();
 
@@ -107,10 +110,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        /*SharedPreferences prefs = PreferenceManager
+        SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(this);
-        String baseUrl = prefs.getString("base_url", "http://192.168.1.106:3000");
-        ServiceUtils.setNewUrl(baseUrl);*/
+        String baseUrl = prefs.getString("url_text", "http://192.168.1.106:3000");
+        try{
+        ServiceUtils.setNewUrl(baseUrl);
+        }catch (Exception ex){
+            showSnack(ex.getMessage());
+        }
     }
 
     private void setRefreshLayout() {
@@ -248,6 +255,8 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent i = new Intent(this, SettingsActivity.class);
+            startActivity(i);
             return true;
         }
 

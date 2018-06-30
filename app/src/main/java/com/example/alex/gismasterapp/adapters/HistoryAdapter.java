@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.example.alex.gismasterapp.activities.ForecastActivity;
 import com.example.alex.gismasterapp.activities.MainActivity;
 import com.example.alex.gismasterapp.R;
 import com.example.alex.gismasterapp.Utils;
@@ -74,9 +75,9 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Intent intent = new Intent(mContext, ForecastActivity.class);
-                //intent.putExtra(MainActivity.LAT_LON_ADDRESS_DATA,cities.get(position));
-                //mContext.startActivity(intent);
+                Intent intent = new Intent(mContext, ForecastActivity.class);
+                intent.putExtra(MainActivity.LAT_LON_ADDRESS_DATA,cities.get(position));
+                mContext.startActivity(intent);
             }
         });
         holder.parentLayout.setOnLongClickListener(new View.OnLongClickListener() {

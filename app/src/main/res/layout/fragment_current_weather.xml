@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.CurrentWeatherFragment"
+    android:background="@drawable/stellar">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <ImageView
+        android:id="@+id/arrow"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/up_arrow"
+        />
+    <TextView
+        android:id="@+id/tvCityName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Запорожье"
+        android:textColor="#ffffff"
+        android:layout_centerHorizontal="true"
+        android:textSize="30sp"
+        android:layout_marginTop="10dp"
+
+        />
+    <ImageView
+        android:id="@+id/ivWeatherIcon"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_below="@id/tvCityName"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvCityName"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="15dp"
+        android:layout_alignParentLeft="true"
+        android:orientation="vertical"
+        android:gravity="center"
+        >
+        <TextView
+            android:id="@+id/tvSunRise"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="4:40:40"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            />
+        <TextView
+            android:layout_below="@id/tvSunRise"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Восход"
+            android:textColor="#bbffffff"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/sunsetLay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvCityName"
+        android:layout_marginTop="50dp"
+        android:layout_marginRight="15dp"
+        android:layout_alignParentRight="true"
+        android:orientation="vertical"
+        android:gravity="center"
+        >
+        <TextView
+            android:id="@+id/tvSunSet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="20:40:40"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            />
+        <TextView
+            android:layout_below="@id/tvSunRise"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Заход"
+            android:textColor="#bbffffff"/>
+    </LinearLayout>
+    <TextView
+        android:id="@+id/tvTemp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/sunsetLay"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="55dp"
+        android:textSize="70sp"
+        android:text="25"
+
+        android:textColor="#ffffff"
+
+
+        />
+    <TextView
+        android:layout_toRightOf="@id/tvTemp"
+        android:layout_toEndOf="@id/tvTemp"
+        android:layout_below="@+id/sunsetLay"
+        android:layout_marginTop="55dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="℃"
+        android:textColor="#c5ffffff"
+        android:textSize="20sp"
+        />
+    <TextView
+        android:id="@+id/tvDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ivWeatherIcon"
+        android:layout_centerHorizontal="true"
+        android:text="Yasno"
+        android:textColor="#cfffffff"
+        android:textSize="20sp"
+
+        />
+    <LinearLayout
+        android:id="@+id/windLay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_below="@id/tvTemp"
+
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        >
+        <TextView
+            android:id="@+id/viewTextWind"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ветер, м/с"
+            android:textColor="#fff"
+            android:textSize="10sp"
+            />
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:id="@+id/wind_direction_icon_current"
+            android:src="@drawable/common_google_signin_btn_icon_dark_normal_background"
+            />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvWind_description_current"
+                android:textAlignment="center"
+                android:textSize="30sp"
+                android:text="SW"
+                android:textStyle="bold"
+                android:layout_below="@id/wind_direction_icon_current"
+                android:textColor="#FFF"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvWind_speed_current"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                android:text="7"
+                android:textStyle="italic"
+                android:layout_marginLeft="2dp"
+                android:textColor="#f5fc21"
+                />
+        </LinearLayout>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnOpenMap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Открыть на карте"
+        style="@style/Widget.AppCompat.Button.Colored"
+
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="15dp"/>
+
+</RelativeLayout>

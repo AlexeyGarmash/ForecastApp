@@ -9,9 +9,7 @@ import com.google.gson.annotations.SerializedName;
 
 
 public class CityInfo implements Parcelable {
-
-
-
+    
     @SerializedName("lat")
     @Expose
     private double lat;
