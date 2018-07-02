@@ -6,24 +6,23 @@
     android:layout_height="match_parent"
     tools:context=".activities.MainActivity">
 
-    <!--<android.support.design.widget.AppBarLayout
+    <android.support.design.widget.AppBarLayout
         android:id="@+id/toolbarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
-        </android.support.design.widget.AppBarLayout>
--->
+
+
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay"
             android:theme="@style/AppTheme.AppBarOverlay"
             app:title="Gismaster">
 
         </android.support.v7.widget.Toolbar>
-
+</android.support.design.widget.AppBarLayout>
 
 
 
@@ -32,7 +31,7 @@
     <ProgressBar
         android:visibility="visible"
         android:indeterminate="true"
-        android:layout_below="@id/toolbar"
+        android:layout_below="@id/toolbarLayout"
         android:id="@+id/progressBarStatus"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
@@ -86,4 +85,5 @@
             android:foreground="?android:attr/selectableItemBackground">
         </android.support.v7.widget.RecyclerView>
     </android.support.v4.widget.SwipeRefreshLayout>
+
 </RelativeLayout>

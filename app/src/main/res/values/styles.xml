@@ -40,4 +40,16 @@
     <style name="HorizontalProgress" parent="Theme.AppCompat.Light">
         <item name="colorAccent">#ff000d</item>
     </style>
+
+
+    <style name="FloatingGps" parent="Theme.AppCompat.Light">
+        <item name="colorAccent">#00e676</item>
+    </style>
+
+
+    <style name="AppTheme.Launcher">
+        <item name="android:windowBackground">@drawable/launch_screen</item>
+        <!-- для Android 5+ вы можете поменять цвет colorPrimaryDark, чтобы соответствовать цвету windowBackground -->
+        <!-- <item name="colorPrimaryDark">@android:color/white</item> -->
+    </style>
 </resources>
