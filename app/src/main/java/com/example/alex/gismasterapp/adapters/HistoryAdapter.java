@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.alex.gismasterapp.activities.ForecastActivity;
 import com.example.alex.gismasterapp.activities.MainActivity;
@@ -87,6 +88,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
                 bottomSheetFragment.setHistoryAdapter(getThis());
                 bottomSheetFragment.setIndex(position);
                 bottomSheetFragment.show(((MainActivity)mContext).getSupportFragmentManager(), bottomSheetFragment.getTag());
+                //Toast.makeText(mContext, cities.get(position).getCoord().getId(), Toast.LENGTH_SHORT).show();
                 return false;
             }
         });

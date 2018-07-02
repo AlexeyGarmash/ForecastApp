@@ -78,6 +78,12 @@ public class WeatherCurrentInfo implements Parcelable {
         this.cityInfo = coord;
     }
 
+    public void setNewCurrentWeather(WeatherCurrentInfo newCurrentWeather){
+        setSunriseTime(newCurrentWeather.getSunriseTime());
+        setSunsetTime(newCurrentWeather.getSunsetTime());
+        setWeatherPart(newCurrentWeather.getWeatherPart());
+    }
+
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(weatherPart);
         dest.writeValue(sunriseTime);

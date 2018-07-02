@@ -6,25 +6,41 @@
     android:layout_height="match_parent"
     tools:context=".activities.MainActivity">
 
-    <android.support.design.widget.AppBarLayout
+    <!--<android.support.design.widget.AppBarLayout
         android:id="@+id/toolbarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
-
+        </android.support.design.widget.AppBarLayout>
+-->
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay"
-            app:title="Gismaster"/>
+            android:theme="@style/AppTheme.AppBarOverlay"
+            app:title="Gismaster">
 
-    </android.support.design.widget.AppBarLayout>
+        </android.support.v7.widget.Toolbar>
 
+
+
+
+
+
+    <ProgressBar
+        android:visibility="visible"
+        android:indeterminate="true"
+        android:layout_below="@id/toolbar"
+        android:id="@+id/progressBarStatus"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
     <fragment
         android:id="@+id/place_autocomplete_fragment"
-        android:layout_below = "@+id/toolbarLayout"
+        android:layout_below = "@+id/progressBarStatus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"

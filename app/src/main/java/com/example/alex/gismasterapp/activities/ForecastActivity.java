@@ -1,7 +1,9 @@
 package com.example.alex.gismasterapp.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -27,6 +29,7 @@ import com.example.alex.gismasterapp.models.WeatherInfo;
 import com.example.alex.gismasterapp.retrofit.AppWeatherService;
 import com.example.alex.gismasterapp.retrofit.ServiceUtils;
 import com.google.gson.Gson;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,7 +60,7 @@ public class ForecastActivity extends AppCompatActivity {
     private ImageView mImageViewWeatherIcon;
     private TextView mTextViewWindDir;
     private TextView mTextViewWindSpeed;
-    //private SlidingUpPanelLayout mSlidingUpPanelLayout;
+    private SlidingUpPanelLayout mSlidingUpPanelLayout;
 
     //Forecast five days info views
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -81,6 +84,7 @@ public class ForecastActivity extends AppCompatActivity {
         currentWeather = getIntent().getExtras().getParcelable(MainActivity.LAT_LON_ADDRESS_DATA);
         cityName = currentWeather.getCoord().getCityName();
         countryName = currentWeather.getCoord().getCountryName();
+        toolbar.setTitle(String.format("%s, %s", cityName, countryName));
         gson = new Gson();
         mAppWeatherService = ServiceUtils.getService("http://192.168.1.106:3000");
 
@@ -91,7 +95,7 @@ public class ForecastActivity extends AppCompatActivity {
         setRecyclerView();
         setSpinner();
         setRefreshLayout();
-        sendPostForecast(currentWeather.getCoord());
+
 
     }
 
@@ -292,5 +296,20 @@ public class ForecastActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         disposable.dispose();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(this);
+        String baseUrl = prefs.getString("url_text", "http://192.168.1.106:3000");
+        try{
+            mAppWeatherService = ServiceUtils.getService(baseUrl);
+            //ServiceUtils.setNewUrl(baseUrl);
+        }catch (Exception ex){
+            showSnack(ex.getMessage());
+        }
+        sendPostForecast(currentWeather.getCoord());
     }
 }

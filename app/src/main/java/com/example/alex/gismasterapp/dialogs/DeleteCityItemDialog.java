@@ -7,6 +7,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 
 import com.example.alex.gismasterapp.adapters.HistoryAdapter;
+import com.example.alex.gismasterapp.realm.RealmDb;
 
 public class DeleteCityItemDialog extends DialogFragment {
     private HistoryAdapter historyAdapter;
@@ -30,6 +31,7 @@ public class DeleteCityItemDialog extends DialogFragment {
                 .setCancelable(false)
                 .setPositiveButton("Да", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        RealmDb.removeRealmModel(historyAdapter.getCities().get(index).getCoord().getCityInfoRealm());
                         historyAdapter.getCities().remove(index);
                         historyAdapter.notifyDataSetChanged();
                         //historyDb.deleteCity(new Gson().toJson(historyAdapter.getCities().get(index).getCoord(), CityInfo.class));

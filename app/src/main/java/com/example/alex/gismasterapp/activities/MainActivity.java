@@ -16,12 +16,18 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
+import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.alex.gismasterapp.R;
 import com.example.alex.gismasterapp.adapters.HistoryAdapter;
 import com.example.alex.gismasterapp.models.CityInfo;
 import com.example.alex.gismasterapp.models.WeatherCurrentInfo;
+import com.example.alex.gismasterapp.realm.RealmDb;
+import com.example.alex.gismasterapp.realm.models.CityInfoRealm;
 import com.example.alex.gismasterapp.retrofit.AppWeatherService;
 import com.example.alex.gismasterapp.retrofit.ServiceUtils;
 import com.google.android.gms.common.api.Status;
@@ -38,6 +44,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
+import io.realm.Realm;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private TextView mTextViewListEmpty;
+    private ProgressBar mProgressBarStatus;
+    private Switch mSwitch;
 
     private HistoryAdapter mHistoryAdapter;
 
@@ -68,16 +77,20 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setAutoCompleteFragment();
 
+        mProgressBarStatus = findViewById(R.id.progressBarStatus);
         mRecyclerView = findViewById(R.id.rvHistory);
         mTextViewListEmpty = findViewById(R.id.tvListEmpty);
-        LinearLayoutManager llm = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(llm);
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
+        mLayoutManager.setReverseLayout(true);
+        mLayoutManager.setStackFromEnd(true);
+        mRecyclerView.setLayoutManager(mLayoutManager);
         currentInfos = new ArrayList<>();
         mHistoryAdapter = new HistoryAdapter(currentInfos, this);
         mRecyclerView.setAdapter(mHistoryAdapter);
@@ -97,14 +110,11 @@ public class MainActivity extends AppCompatActivity {
         });
         gson = new Gson();
 
-        mAppWeatherService = ServiceUtils.getService("http://192.168.1.106:3000");
+
 
 
         //new DownloadCities().execute();
         setRefreshLayout();
-
-
-
     }
 
     @Override
@@ -114,10 +124,12 @@ public class MainActivity extends AppCompatActivity {
                 .getDefaultSharedPreferences(this);
         String baseUrl = prefs.getString("url_text", "http://192.168.1.106:3000");
         try{
-        ServiceUtils.setNewUrl(baseUrl);
+            mAppWeatherService = ServiceUtils.getService(baseUrl);
+            //ServiceUtils.setNewUrl(baseUrl);
         }catch (Exception ex){
             showSnack(ex.getMessage());
         }
+        readDatabase();
     }
 
     private void setRefreshLayout() {
@@ -129,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                new UpdateWeather().execute();
+                readDatabase();
             }
         });
     }
@@ -152,8 +164,9 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, "Place: " + place.getName());//get place details here
                 address = place.getAddress().toString();
                 //new GetCoordinates().execute(address.replace(" ", "+"));
+                mProgressBarStatus.setVisibility(View.VISIBLE);
                 sendPostLocation(address);
-                autocompleteFragment.setText(place.getAddress().toString());
+                autocompleteFragment.setText("");
             }
 
             @Override
@@ -165,8 +178,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void sendPostLocation(String addr) {
 
+
+    private void sendPostLocation(String addr) {
         disposable.add(mAppWeatherService.getLocation(new CityInfo(addr))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -175,6 +189,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(CityInfo cityInfo) {
                         sendPostCurrentWeather(cityInfo, ADD_TO_LIST, 0);
+                        RealmDb.insertRealmModel(cityInfo.getCityInfoRealm());
+                        mProgressBarStatus.setVisibility(View.INVISIBLE);
                         //mHistoryDb.insertCity(gson.toJson(cityInfo));
                         //realmDb.insertCity(cityInfo);
                         //new InsertCitiy(cityInfo).execute();
@@ -183,13 +199,14 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onError(Throwable e) {
                         showSnack(e.getMessage());
+                        mProgressBarStatus.setVisibility(View.INVISIBLE);
                     }
                 }));
 
     }
 
     private void sendPostCurrentWeather(final CityInfo cityInfo, final int type, final int index){
-
+        mProgressBarStatus.setVisibility(View.VISIBLE);
         disposable.add(mAppWeatherService.getCurrentWeather(cityInfo)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -200,25 +217,64 @@ public class MainActivity extends AppCompatActivity {
 
                         switch (type){
                             case UPDATE_WEATHER:
-                                updateCurrentWeather(currentWeatherInfo, currentInfos.get(index));
+                                updateCurrentWeather(currentWeatherInfo, index);
                                 break;
                             case ADD_TO_LIST:
                                 addToList(currentWeatherInfo, cityInfo);
                                 break;
-
+                            case DATABASE_DOWNLOAD:
+                                addFromDatabase(currentWeatherInfo, cityInfo);
+                                break;
                         }
+                        mProgressBarStatus.setVisibility(View.INVISIBLE);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         showSnack(e.getMessage());
+                        mProgressBarStatus.setVisibility(View.INVISIBLE);
                     }
                 }));
     }
 
-    private void updateCurrentWeather(WeatherCurrentInfo newCurrentWeatherInfo, WeatherCurrentInfo currentWeatherInfo){
-        newCurrentWeatherInfo = currentWeatherInfo;
+    private void readDatabase(){
+        mProgressBarStatus.setVisibility(View.VISIBLE);
+
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                currentInfos.clear();
+                Realm realm = null;
+                try {
+                    realm = Realm.getDefaultInstance();
+                    List<CityInfoRealm> models = realm.where(CityInfoRealm.class).findAll();
+                    for(CityInfoRealm city : models){
+                        sendPostCurrentWeather(city.getCityInfo(), DATABASE_DOWNLOAD, 0);
+                        Log.i(TAG, "ID = " + city.getCityInfo().getId());
+                    }
+                } finally {
+                    if (realm != null) {
+                        realm.close();
+                    }
+                    if(mSwipeRefreshLayout.isRefreshing())
+                        mSwipeRefreshLayout.setRefreshing(false);
+                    mProgressBarStatus.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+    }
+
+    private void addFromDatabase(WeatherCurrentInfo currentWeatherInfo, CityInfo cityInfo){
+        currentWeatherInfo.getCoord().setCityName(cityInfo.getCityName());
+        currentWeatherInfo.getCoord().setCountryName(cityInfo.getCountryName());
+        currentWeatherInfo.getCoord().setId(cityInfo.getId());
+        currentInfos.add(currentWeatherInfo);
         mHistoryAdapter.notifyDataSetChanged();
+
+    }
+
+    private void updateCurrentWeather(WeatherCurrentInfo newCurrentWeatherInfo, int index){
+        currentInfos.get(index).setNewCurrentWeather(newCurrentWeatherInfo);
     }
 
     private void addToList(WeatherCurrentInfo currentWeatherInfo, CityInfo cityInfo){
@@ -243,6 +299,25 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        mSwitch = (Switch)menu.findItem(R.id.myswitch)
+                .getActionView().findViewById(R.id.switchForActionBar);
+
+        mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,
+                                         boolean isChecked) {
+                if (isChecked) {
+                    Toast.makeText(getApplication(), "Ночь", Toast.LENGTH_SHORT)
+                            .show();
+                    setTheme(R.style.AppThemeDark);
+                } else {
+                    Toast.makeText(getApplication(), "День", Toast.LENGTH_SHORT)
+                            .show();
+                    setTheme(R.style.AppTheme);
+                }
+            }
+        });
         return true;
     }
 
@@ -266,7 +341,14 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private class UpdateWeather extends AsyncTask<Void, Void, Void> {
+    private void updateWeather(){
+        for(int i =0; i < currentInfos.size(); i++){
+            sendPostCurrentWeather(currentInfos.get(i).getCoord(), UPDATE_WEATHER, i);
+        }
+        if(mSwipeRefreshLayout.isRefreshing())
+            mSwipeRefreshLayout.setRefreshing(false);
+    }
+    /*private class UpdateWeather extends AsyncTask<Void, Void, Void> {
 
         protected Void doInBackground(Void... voids) {
             for(int i =0; i < currentInfos.size(); i++){
@@ -277,10 +359,9 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if(mSwipeRefreshLayout.isRefreshing())
-                mSwipeRefreshLayout.setRefreshing(false);
+
         }
-    }
+    }*/
 
 
 

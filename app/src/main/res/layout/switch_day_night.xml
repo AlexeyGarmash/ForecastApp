@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/switchView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <Switch
+        android:id="@+id/switchForActionBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+
+        android:textOn="Н"
+        android:textOff="Д"
+        android:visibility="visible"
+        android:checked="false"
+        android:thumb="@drawable/switch_custom_selector"
+        android:track="@drawable/switch_custom_track"
+        android:showText="true"
+        android:theme="@style/AppTheme"/>
+
+
+
+
+
+</RelativeLayout>

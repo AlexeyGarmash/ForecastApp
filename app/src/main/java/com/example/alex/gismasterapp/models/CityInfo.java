@@ -3,13 +3,21 @@ package com.example.alex.gismasterapp.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.example.alex.gismasterapp.realm.models.CityInfoRealm;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 
 public class CityInfo implements Parcelable {
-    
+
+    @PrimaryKey
+    @SerializedName("id")
+    @Expose
+    private String id;
+
     @SerializedName("lat")
     @Expose
     private double lat;
@@ -67,6 +75,15 @@ public class CityInfo implements Parcelable {
         this.countryName = ((String) in.readValue((String.class.getClassLoader())));
         this.status = ((String) in.readValue((String.class.getClassLoader())));
         this.address = ((String) in.readValue((String.class.getClassLoader())));
+        this.id = ((String) in.readValue((String.class.getClassLoader())));
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public CityInfo(String address) {
@@ -121,6 +138,10 @@ public class CityInfo implements Parcelable {
         return this.status;
     }
 
+    public CityInfoRealm getCityInfoRealm(){
+        return new CityInfoRealm(id, lat, lon, status, cityName, countryName, address);
+    }
+
 
 
     @Override
@@ -131,6 +152,7 @@ public class CityInfo implements Parcelable {
         dest.writeValue(countryName);
         dest.writeValue(status);
         dest.writeValue(address);
+        dest.writeValue(id);
     }
 
     @Override
