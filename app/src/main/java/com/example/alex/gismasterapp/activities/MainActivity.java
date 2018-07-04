@@ -135,15 +135,7 @@ public class MainActivity extends AppCompatActivity {
         //new DownloadCities().execute();
         setRefreshLayout();
 
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(this);
-        String baseUrl = prefs.getString("url_text", "http://192.168.1.106:3000");
-        try {
-            mAppWeatherService = ServiceUtils.getService(baseUrl);
-            //ServiceUtils.setNewUrl(baseUrl);
-        } catch (Exception ex) {
-            showSnack(ex.getMessage());
-        }
+
 
     }
 
@@ -158,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(this);
-        String baseUrl = prefs.getString("url_text", "http://192.168.1.106:3000");
+        String baseUrl = prefs.getString("url_text", "http://46.119.9.114:3000");
         try {
             mAppWeatherService = ServiceUtils.getService(baseUrl);
             //ServiceUtils.setNewUrl(baseUrl);
