@@ -2,7 +2,9 @@
 An application that displays the weather.
 
 #### Configure the application if you start the server on your machine (server Git url: https://github.com/AlexeyGarmash/WeatherServer)
-1. Install app
+1. Install app:
+  - __GoogleDrive__ : https://drive.google.com/open?id=1T6lvw8xoQg5T9y0DwhKLqYdE4klUv1t8
+  - __repository__ : apk file in the repository
 2. Run app
 3. Go to Settings 
 4. Configure server address
