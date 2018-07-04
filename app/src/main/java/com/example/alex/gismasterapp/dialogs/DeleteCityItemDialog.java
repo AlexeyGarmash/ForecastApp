@@ -9,6 +9,9 @@ import android.support.v7.app.AlertDialog;
 import com.example.alex.gismasterapp.adapters.HistoryAdapter;
 import com.example.alex.gismasterapp.realm.RealmDb;
 
+/**
+ * Класс-диалог, возникающий при попытке удалить место из истории.
+ */
 public class DeleteCityItemDialog extends DialogFragment {
     private HistoryAdapter historyAdapter;
 
@@ -17,14 +20,22 @@ public class DeleteCityItemDialog extends DialogFragment {
     //private HistoryDb historyDb;
 
 
-    public DeleteCityItemDialog(){
+    /**
+     * Конструктор без параметров.
+     */
+    public DeleteCityItemDialog() {
 
     }
 
 
+    /**
+     * Вызывается в момент создания диалога, создавая пользовательский макет.
+     *
+     * @param savedInstanceState
+     * @return диалоговое окно
+     */
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        //historyDb = new HistoryDb(new HistoryDbHelper(historyAdapter.getmContext()));
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage("Удалить место из истории?")
                 .setTitle("Удаление")
@@ -34,7 +45,6 @@ public class DeleteCityItemDialog extends DialogFragment {
                         RealmDb.removeRealmModel(historyAdapter.getCities().get(index).getCoord().getCityInfoRealm());
                         historyAdapter.getCities().remove(index);
                         historyAdapter.notifyDataSetChanged();
-                        //historyDb.deleteCity(new Gson().toJson(historyAdapter.getCities().get(index).getCoord(), CityInfo.class));
                     }
                 })
                 .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
@@ -45,10 +55,20 @@ public class DeleteCityItemDialog extends DialogFragment {
         return builder.create();
     }
 
+    /**
+     * Сеттер для {@link HistoryAdapter}
+     *
+     * @param historyAdapter обьект {@link HistoryAdapter}
+     */
     public void setHistoryAdapter(HistoryAdapter historyAdapter) {
         this.historyAdapter = historyAdapter;
     }
 
+    /**
+     * Сеттер для индекса, по которому ведется удаление.
+     *
+     * @param index индекс в списке
+     */
     public void setIndex(int index) {
         this.index = index;
     }

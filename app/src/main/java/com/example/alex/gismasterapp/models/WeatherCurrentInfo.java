@@ -6,6 +6,9 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Класс-модель информации о текущей погоде в заданом месте.
+ */
 public class WeatherCurrentInfo implements Parcelable {
     @SerializedName("weatherPart")
     @Expose
@@ -33,8 +36,7 @@ public class WeatherCurrentInfo implements Parcelable {
             return (new WeatherCurrentInfo[size]);
         }
 
-    }
-            ;
+    };
 
     protected WeatherCurrentInfo(Parcel in) {
         this.weatherPart = ((WeatherPart) in.readValue((WeatherPart.class.getClassLoader())));
@@ -78,7 +80,7 @@ public class WeatherCurrentInfo implements Parcelable {
         this.cityInfo = coord;
     }
 
-    public void setNewCurrentWeather(WeatherCurrentInfo newCurrentWeather){
+    public void setNewCurrentWeather(WeatherCurrentInfo newCurrentWeather) {
         setSunriseTime(newCurrentWeather.getSunriseTime());
         setSunsetTime(newCurrentWeather.getSunsetTime());
         setWeatherPart(newCurrentWeather.getWeatherPart());
@@ -96,10 +98,9 @@ public class WeatherCurrentInfo implements Parcelable {
     }
 
 
-
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof WeatherCurrentInfo){
+        if (obj instanceof WeatherCurrentInfo) {
             WeatherCurrentInfo toCompare = (WeatherCurrentInfo) obj;
             return this.cityInfo.equals(toCompare.getCoord());
         }

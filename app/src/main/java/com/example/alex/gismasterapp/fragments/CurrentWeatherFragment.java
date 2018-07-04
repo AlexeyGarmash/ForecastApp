@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import com.example.alex.gismasterapp.R;
 
 /**
- * A simple {@link Fragment} subclass.
+ * {@link Fragment} subclass для привязки данных о текущей погоде к Views.
  */
 public class CurrentWeatherFragment extends Fragment {
 

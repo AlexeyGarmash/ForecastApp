@@ -1,13 +1,15 @@
 package com.example.alex.gismasterapp.activities;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -48,21 +50,30 @@ import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 
+
+/**
+ * Класс MainActivity служит для обработки и отображения информации
+ * о текущей погоде вместе с локальной историей запросов по городам.
+ *
+ * @author Alex
+ * @version 1.0
+ */
 public class MainActivity extends AppCompatActivity {
 
+    private boolean already;
     public static String TAG = "MainActivity";
     public static String LAT_LON_ADDRESS_DATA;
 
-    private static final int  UPDATE_WEATHER = 1;
-    private static final int  DATABASE_DOWNLOAD = 2;
-    private static final int  ADD_TO_LIST = 3;
+    private static final int UPDATE_WEATHER = 1;
+    private static final int DATABASE_DOWNLOAD = 2;
+    private static final int ADD_TO_LIST = 3;
 
     private RecyclerView mRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private TextView mTextViewListEmpty;
     private ProgressBar mProgressBarStatus;
     private Switch mSwitch;
-
+    private Toolbar toolbar;
     private HistoryAdapter mHistoryAdapter;
 
     private Gson gson;
@@ -75,17 +86,25 @@ public class MainActivity extends AppCompatActivity {
     private List<WeatherCurrentInfo> currentInfos;
 
 
+    public static final int MY_PERMISSIONS_REQUEST_READ_MEDIA = 1;
 
-
-
+    /**
+     * Метод используется при создании активити
+     * во время холодного старта. Служит для инициализации переменных.
+     *
+     * @param savedInstanceState отвечает за сохранениние состояния активити (null если впервые или при перевороте).
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setAutoCompleteFragment();
+
+        already = false;
+
 
         mProgressBarStatus = findViewById(R.id.progressBarStatus);
         mRecyclerView = findViewById(R.id.rvHistory);
@@ -103,10 +122,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged() {
                 super.onChanged();
-                if(mHistoryAdapter.getItemCount()==0){
+                if (mHistoryAdapter.getItemCount() == 0) {
                     mTextViewListEmpty.setVisibility(View.VISIBLE);
-                }
-                else{
+                } else {
                     mTextViewListEmpty.setVisibility(View.INVISIBLE);
                 }
             }
@@ -114,27 +132,47 @@ public class MainActivity extends AppCompatActivity {
         gson = new Gson();
 
 
-
-
         //new DownloadCities().execute();
         setRefreshLayout();
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(this);
         String baseUrl = prefs.getString("url_text", "http://192.168.1.106:3000");
-        try{
+        try {
             mAppWeatherService = ServiceUtils.getService(baseUrl);
             //ServiceUtils.setNewUrl(baseUrl);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             showSnack(ex.getMessage());
         }
+
+    }
+
+
+    /**
+     * Метод используется для установки адреса сервера с настроек приложения и загрузки с БД данных
+     * про уже ранее найденные города.
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(this);
+        String baseUrl = prefs.getString("url_text", "http://192.168.1.106:3000");
+        try {
+            mAppWeatherService = ServiceUtils.getService(baseUrl);
+            //ServiceUtils.setNewUrl(baseUrl);
+        } catch (Exception ex) {
+            showSnack(ex.getMessage());
+        }
+
         readDatabase();
     }
 
+    /**
+     * Метод служит для инициализации и установки параметров
+     * {@link SwipeRefreshLayout}, необходимого для обновления информации по свайпу сверху вниз.
+     */
     private void setRefreshLayout() {
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeLayoutMain);
         mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
@@ -149,6 +187,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Метод служит для инициализации и установки параметров
+     * {@link PlaceAutocompleteFragment}, необходимого для поиска адреса
+     * по введенному названию города пользователя.
+     */
     private void setAutoCompleteFragment() {
         final PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
@@ -181,22 +224,23 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
-
+    /**
+     * Метод, посылающий запрос на сервер для получения
+     * координат по полученному адресу.
+     *
+     * @param addr точный адрес введенного пользователем места
+     */
     private void sendPostLocation(String addr) {
         disposable.add(mAppWeatherService.getLocation(new CityInfo(addr))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableSingleObserver<CityInfo>(){
+                .subscribeWith(new DisposableSingleObserver<CityInfo>() {
 
                     @Override
                     public void onSuccess(CityInfo cityInfo) {
                         sendPostCurrentWeather(cityInfo, ADD_TO_LIST, 0);
                         RealmDb.insertRealmModel(cityInfo.getCityInfoRealm());
                         mProgressBarStatus.setVisibility(View.INVISIBLE);
-                        //mHistoryDb.insertCity(gson.toJson(cityInfo));
-                        //realmDb.insertCity(cityInfo);
-                        //new InsertCitiy(cityInfo).execute();
                     }
 
                     @Override
@@ -205,20 +249,29 @@ public class MainActivity extends AppCompatActivity {
                         mProgressBarStatus.setVisibility(View.INVISIBLE);
                     }
                 }));
-
     }
 
-    private void sendPostCurrentWeather(final CityInfo cityInfo, final int type, final int index){
+    /**
+     * Посылает запрос на сервер для получения текущей (на момент API)
+     * статуса погоды на местности.
+     *
+     * @param cityInfo содержит координаты, нужные для получения погоды
+     * @param type     тип обращения к методу: UPDATE_WEATHER - обновить данные списка,
+     *                 ADD_TO_LIST - добавить в список,
+     *                 DATABASE_DOWNLOAD - загрузить с БД
+     * @param index    индекс города для обновления в списке
+     */
+    private void sendPostCurrentWeather(final CityInfo cityInfo, final int type, final int index) {
         mProgressBarStatus.setVisibility(View.VISIBLE);
         disposable.add(mAppWeatherService.getCurrentWeather(cityInfo)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableSingleObserver<WeatherCurrentInfo>(){
+                .subscribeWith(new DisposableSingleObserver<WeatherCurrentInfo>() {
 
                     @Override
                     public void onSuccess(WeatherCurrentInfo currentWeatherInfo) {
 
-                        switch (type){
+                        switch (type) {
                             case UPDATE_WEATHER:
                                 updateCurrentWeather(currentWeatherInfo, index);
                                 break;
@@ -240,7 +293,11 @@ public class MainActivity extends AppCompatActivity {
                 }));
     }
 
-    private void readDatabase(){
+    /**
+     * Получает данные из БД, организовует передачу считанных координат на сервер для получения
+     * погоды каждого из имеющихся городов.
+     */
+    private void readDatabase() {
         mProgressBarStatus.setVisibility(View.VISIBLE);
 
         this.runOnUiThread(new Runnable() {
@@ -251,7 +308,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     realm = Realm.getDefaultInstance();
                     List<CityInfoRealm> models = realm.where(CityInfoRealm.class).findAll();
-                    for(CityInfoRealm city : models){
+                    for (CityInfoRealm city : models) {
                         sendPostCurrentWeather(city.getCityInfo(), DATABASE_DOWNLOAD, 0);
                         Log.i(TAG, "ID = " + city.getCityInfo().getId());
                     }
@@ -259,7 +316,7 @@ public class MainActivity extends AppCompatActivity {
                     if (realm != null) {
                         realm.close();
                     }
-                    if(mSwipeRefreshLayout.isRefreshing())
+                    if (mSwipeRefreshLayout.isRefreshing())
                         mSwipeRefreshLayout.setRefreshing(false);
                     mProgressBarStatus.setVisibility(View.INVISIBLE);
                 }
@@ -267,7 +324,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void addFromDatabase(WeatherCurrentInfo currentWeatherInfo, CityInfo cityInfo){
+    /**
+     * Добавляет позицию из БД в список и настраивает поля.
+     *
+     * @param currentWeatherInfo полученный ответ от запроса на получение текущей погоды
+     * @param cityInfo           полученный ответ от запроса на получение информации о городе
+     */
+    private void addFromDatabase(WeatherCurrentInfo currentWeatherInfo, CityInfo cityInfo) {
         currentWeatherInfo.getCoord().setCityName(cityInfo.getCityName());
         currentWeatherInfo.getCoord().setCountryName(cityInfo.getCountryName());
         currentWeatherInfo.getCoord().setId(cityInfo.getId());
@@ -276,34 +339,57 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void updateCurrentWeather(WeatherCurrentInfo newCurrentWeatherInfo, int index){
+    /**
+     * Обновляет index позицию в истории запросов.
+     *
+     * @param newCurrentWeatherInfo полученный ответ от запроса на обновление погоды по позиции в списке
+     * @param index                 позиция места в списке
+     */
+    private void updateCurrentWeather(WeatherCurrentInfo newCurrentWeatherInfo, int index) {
         currentInfos.get(index).setNewCurrentWeather(newCurrentWeatherInfo);
     }
 
-    private void addToList(WeatherCurrentInfo currentWeatherInfo, CityInfo cityInfo){
+    /**
+     * Добавляет или не добавляет в список место в зависимости от наличия его в списке.
+     *
+     * @param currentWeatherInfo полученный ответ от запроса на получение текущей погоды
+     * @param cityInfo           полученный ответ от запроса на получение информации о городе
+     */
+    private void addToList(WeatherCurrentInfo currentWeatherInfo, CityInfo cityInfo) {
         WeatherCurrentInfo currentInfo = currentWeatherInfo;
         currentInfo.getCoord().setCityName(cityInfo.getCityName());
         currentInfo.getCoord().setCountryName(cityInfo.getCountryName());
 
         boolean isContain = currentInfos.contains(currentInfo);
-        if(!isContain){
+        if (!isContain) {
             currentInfos.add(currentInfo);
         }
         mHistoryAdapter.notifyDataSetChanged();
     }
 
 
-    private void showSnack(String message){
+    /**
+     * Показывает {@link Snackbar} с заданным сообщением.
+     *
+     * @param message сообщение (инфо, ошибка и т.п)
+     */
+    private void showSnack(String message) {
         Snackbar.make(mRecyclerView, message, Snackbar.LENGTH_LONG).show();
     }
 
 
+    /**
+     * Создает меню для {@link android.support.v7.app.ActionBar} из ресурса.
+     *
+     * @param menu меню
+     * @return успешное создание меню.
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
-        mSwitch = (Switch)menu.findItem(R.id.myswitch)
+        mSwitch = (Switch) menu.findItem(R.id.myswitch)
                 .getActionView().findViewById(R.id.switchForActionBar);
 
         mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -324,6 +410,12 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Определят нажатия на пунктах меню.
+     *
+     * @param item пункт меню, который выбрали.
+     * @return успешный факт нажатия на элемент меню.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -341,40 +433,13 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
-
-
-    private void updateWeather(){
-        for(int i =0; i < currentInfos.size(); i++){
-            sendPostCurrentWeather(currentInfos.get(i).getCoord(), UPDATE_WEATHER, i);
-        }
-        if(mSwipeRefreshLayout.isRefreshing())
-            mSwipeRefreshLayout.setRefreshing(false);
-    }
-    /*private class UpdateWeather extends AsyncTask<Void, Void, Void> {
-
-        protected Void doInBackground(Void... voids) {
-            for(int i =0; i < currentInfos.size(); i++){
-                sendPostCurrentWeather(currentInfos.get(i).getCoord(), UPDATE_WEATHER, i);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-
-        }
-    }*/
-
-
-
-
-
+    /**
+     * Вызывается при уничтожении активити. Освобождает ресурсы.
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
         disposable.dispose();
-        //realmDb.getRealm().close();
     }
 
 

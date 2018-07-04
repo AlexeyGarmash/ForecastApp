@@ -12,6 +12,9 @@ import com.example.alex.gismasterapp.activities.MainActivity;
 import com.example.alex.gismasterapp.adapters.HistoryAdapter;
 import com.example.alex.gismasterapp.dialogs.DeleteCityItemDialog;
 
+/**
+ * Класс-фрагмент, для отображения {@link android.support.design.widget.BottomSheetDialog}
+ */
 public class OptionsBottomSheetFragment extends BottomSheetDialogFragment {
     private int index;
 
@@ -38,7 +41,7 @@ public class OptionsBottomSheetFragment extends BottomSheetDialogFragment {
                 dialog.setHistoryAdapter(historyAdapter);
                 dialog.setIndex(index);
                 getfragment().dismissAllowingStateLoss();
-                dialog.show(((MainActivity)historyAdapter.getmContext()).getSupportFragmentManager(), dialog.getTag());
+                dialog.show(((MainActivity) historyAdapter.getmContext()).getSupportFragmentManager(), dialog.getTag());
 
             }
         });
@@ -59,7 +62,7 @@ public class OptionsBottomSheetFragment extends BottomSheetDialogFragment {
         this.historyAdapter = historyAdapter;
     }
 
-    private OptionsBottomSheetFragment getfragment(){
+    private OptionsBottomSheetFragment getfragment() {
         return this;
     }
 }

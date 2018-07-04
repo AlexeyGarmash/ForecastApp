@@ -10,7 +10,9 @@ import com.google.gson.annotations.SerializedName;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
-
+/**
+ * Класс-модель информации о месте, в котором необходимо получить погоду.
+ */
 public class CityInfo implements Parcelable {
 
     @PrimaryKey
@@ -59,12 +61,10 @@ public class CityInfo implements Parcelable {
             return (new CityInfo[size]);
         }
 
-    }
-            ;
+    };
 
 
-
-    public CityInfo(){
+    public CityInfo() {
 
     }
 
@@ -130,18 +130,17 @@ public class CityInfo implements Parcelable {
         this.countryName = countryName;
     }
 
-    public void setStatus(String status){
+    public void setStatus(String status) {
         this.status = status;
     }
 
-    public String getStatus(){
+    public String getStatus() {
         return this.status;
     }
 
-    public CityInfoRealm getCityInfoRealm(){
+    public CityInfoRealm getCityInfoRealm() {
         return new CityInfoRealm(id, lat, lon, status, cityName, countryName, address);
     }
-
 
 
     @Override
@@ -161,10 +160,9 @@ public class CityInfo implements Parcelable {
     }
 
 
-
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof CityInfo){
+        if (obj instanceof CityInfo) {
             CityInfo toCompare = (CityInfo) obj;
             return this.cityName.equals(toCompare.getCityName())
                     && this.countryName.equals(toCompare.getCountryName())

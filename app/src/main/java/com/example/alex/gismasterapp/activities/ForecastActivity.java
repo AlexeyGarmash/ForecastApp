@@ -40,6 +40,13 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
+/**
+ * Класс ForecastActivity служит для обработки и отображения информации
+ * о прогнозе погоды переданной ему местности.
+ *
+ * @author Alex
+ * @version 1.0
+ */
 public class ForecastActivity extends AppCompatActivity {
 
     private AppWeatherService mAppWeatherService;
@@ -74,6 +81,12 @@ public class ForecastActivity extends AppCompatActivity {
     private Button mButtonOpenMap;
     private Spinner mSpinner;
 
+    /**
+     * Метод используется при создании активити
+     * во время холодного старта. Служит для инициализации переменных.
+     *
+     * @param savedInstanceState отвечает за сохранениние состояния активити (null если впервые или при перевороте).
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,7 +112,11 @@ public class ForecastActivity extends AppCompatActivity {
 
     }
 
-    private void setButton(){
+    /**
+     * Служит для инициализации и установки параметров
+     * Button, необходимого для перехода к карте.
+     */
+    private void setButton() {
         mButtonOpenMap = findViewById(R.id.btnOpenMap);
         mButtonOpenMap.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,12 +126,20 @@ public class ForecastActivity extends AppCompatActivity {
         });
     }
 
-    private void goToMap(){
+    /**
+     * Осуществляет переход к карте.
+     */
+    private void goToMap() {
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra(MainActivity.LAT_LON_ADDRESS_DATA, currentWeather);
         startActivity(intent);
     }
-    private void setRefreshLayout(){
+
+    /**
+     * Метод служит для инициализации и установки параметров
+     * {@link SwipeRefreshLayout}, необходимого для обновления информации по свайпу сверху вниз.
+     */
+    private void setRefreshLayout() {
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeLayout);
         mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
@@ -130,11 +155,17 @@ public class ForecastActivity extends AppCompatActivity {
         });
     }
 
-    private void setTextData(TextView textView, String data){
+    /**
+     * Служит для установки текста в {@link TextView}.
+     */
+    private void setTextData(TextView textView, String data) {
         textView.setText(data);
     }
 
-    private void findViewsCurrentWeatherId(){
+    /**
+     * Инициализирует Views по их ID.
+     */
+    private void findViewsCurrentWeatherId() {
         mTextViewCity = findViewById(R.id.tvCityName);
         mTextViewSunRise = findViewById(R.id.tvSunRise);
         mTextViewSunSet = findViewById(R.id.tvSunSet);
@@ -146,7 +177,10 @@ public class ForecastActivity extends AppCompatActivity {
         mImageViewWeatherIcon = findViewById(R.id.ivWeatherIcon);
     }
 
-    private void setCurrentWeatherData(){
+    /**
+     * Заполняет {@link View}s необходимыми данными из полученной текущей погоды.
+     */
+    private void setCurrentWeatherData() {
         setTextData(mTextViewCity, currentWeather.getCoord().getCityName());
         setTextData(mTextViewSunRise, currentWeather.getSunriseTime());
         setTextData(mTextViewSunSet, currentWeather.getSunsetTime());
@@ -155,10 +189,14 @@ public class ForecastActivity extends AppCompatActivity {
         setTextData(mTextViewWindDir, currentWeather.getWeatherPart().getDirectWind());
         setTextData(mTextViewWindSpeed, String.valueOf(currentWeather.getWeatherPart().getSpeedWind()));
         Utils.setImageByResource(mImageViewWindDir, currentWeather.getWeatherPart().getWindResource(), 60, 60, this);
-        Utils.setImageByURL(this, mImageViewWeatherIcon, 60, 60,  currentWeather.getWeatherPart().getWeatherIconURL());
+        Utils.setImageByURL(this, mImageViewWeatherIcon, 60, 60, currentWeather.getWeatherPart().getWeatherIconURL());
     }
 
-    private void setSpinner(){
+    /**
+     * Метод служит для инициализации и установки параметров
+     * {@link Spinner}ner, необходимого для выбора интервала времени между прогнозами.
+     */
+    private void setSpinner() {
         mSpinner = findViewById(R.id.spinner);
         ArrayAdapter<?> adapter =
                 ArrayAdapter.createFromResource(this, R.array.hours, android.R.layout.simple_spinner_item);
@@ -179,10 +217,18 @@ public class ForecastActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Устанавливает для списка новые данные в зависимомти от выбранного интервала времени в {@link Spinner}ner.
+     *
+     * @param i идентификатор времени:
+     *          0 - 3ч
+     *          1 - 6ч
+     *          2 - 9ч
+     */
     private void updateWeather(int i) {
 
-        switch (i){
-            case  0:
+        switch (i) {
+            case 0:
                 setupAdapter(weathersThreeHours);
                 break;
             case 1:
@@ -194,11 +240,19 @@ public class ForecastActivity extends AppCompatActivity {
         }
     }
 
-    private void setupAdapter(List<WeatherInfo> listWeather){
+    /**
+     * Метод служит для установки адаптера для {@link RecyclerView}erView.
+     */
+    private void setupAdapter(List<WeatherInfo> listWeather) {
         mForecastAdapter = new ForecastAdapter(listWeather, this);
         mRecyclerView.setAdapter(mForecastAdapter);
     }
-    private void setRecyclerView(){
+
+    /**
+     * Метод служит для инициализации и установки параметров
+     * {@link RecyclerView}ew, необходимого для отображения списка с элементами прогноза погоды.
+     */
+    private void setRecyclerView() {
         mRecyclerView = findViewById(R.id.rvForecast);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(llm);
@@ -206,36 +260,49 @@ public class ForecastActivity extends AppCompatActivity {
     }
 
 
-    private void sendPostForecast(CityInfo cityInfo){
+    /**
+     * Посылает запрос на сервер для получения прогноза
+     * погоды на местности и заполняет список прогноза погоды.
+     *
+     * @param cityInfo содержит координаты, нужные для получения погоды
+     */
+    private void sendPostForecast(CityInfo cityInfo) {
 
         disposable.add(mAppWeatherService.getForecast(cityInfo)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableSingleObserver<WeatherInfo[]>(){
+                .subscribeWith(new DisposableSingleObserver<WeatherInfo[]>() {
 
                     @Override
                     public void onSuccess(WeatherInfo[] forecastInfo) {
                         getForecastFromArray(forecastInfo);
                         setupAdapter(weathersThreeHours);
-                        if(mSwipeRefreshLayout.isRefreshing())
+                        if (mSwipeRefreshLayout.isRefreshing())
                             mSwipeRefreshLayout.setRefreshing(false);
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        if(mSwipeRefreshLayout.isRefreshing())
+                        if (mSwipeRefreshLayout.isRefreshing())
                             mSwipeRefreshLayout.setRefreshing(false);
                         showSnack(e.getMessage());
                     }
                 }));
     }
 
-    private void sendPostCurrentWeather(CityInfo cityInfo){
+    /**
+     * Посылает запрос на сервер для получения текущей (на момент API)
+     * статуса погоды на местности и заполянет соответсвующими данными
+     * окно текущей погоды.
+     *
+     * @param cityInfo содержит координаты, нужные для получения погоды
+     */
+    private void sendPostCurrentWeather(CityInfo cityInfo) {
 
         disposable.add(mAppWeatherService.getCurrentWeather(cityInfo)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableSingleObserver<WeatherCurrentInfo>(){
+                .subscribeWith(new DisposableSingleObserver<WeatherCurrentInfo>() {
 
                     @Override
                     public void onSuccess(WeatherCurrentInfo response) {
@@ -244,13 +311,13 @@ public class ForecastActivity extends AppCompatActivity {
                         currentInfo.getCoord().setCountryName(countryName);
                         currentWeather = currentInfo;
                         setCurrentWeatherData();
-                        if(mSwipeRefreshLayout.isRefreshing())
+                        if (mSwipeRefreshLayout.isRefreshing())
                             mSwipeRefreshLayout.setRefreshing(false);
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        if(mSwipeRefreshLayout.isRefreshing())
+                        if (mSwipeRefreshLayout.isRefreshing())
                             mSwipeRefreshLayout.setRefreshing(false);
                         showSnack(e.getMessage());
                     }
@@ -258,17 +325,22 @@ public class ForecastActivity extends AppCompatActivity {
     }
 
 
-    private void getForecastFromArray(WeatherInfo[] weathersArr){
+    /**
+     * Преобразовует массив прогноза погоды в список, нужный для адаптера.
+     *
+     * @param weathersArr массив прогноза погоды, полученный на запрос о прогнозе погоды на 5 дней.
+     */
+    private void getForecastFromArray(WeatherInfo[] weathersArr) {
         weathersThreeHours = Arrays.asList(weathersArr);
         weathersSixHours = new ArrayList<>();
         weathersNineHours = new ArrayList<>();
         int k = 0;
         int p = 0;
         int size = weathersThreeHours.size();
-        for(int i = 0; i < size; i++){
+        for (int i = 0; i < size; i++) {
 
 
-            if(p > size- 1 || k > size - 1){
+            if (p > size - 1 || k > size - 1) {
                 break;
             }
             weathersSixHours.add(weathersThreeHours.get(k));
@@ -276,38 +348,45 @@ public class ForecastActivity extends AppCompatActivity {
             weathersNineHours.add(weathersThreeHours.get(p));
 
 
-
             k += 2;
             p += 3;
         }
     }
 
-
-    private void showToast(String message){
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
-    private void showSnack(String message){
+    /**
+     * Показывает {@link Snackbar}Bar с заданным сообщением.
+     *
+     * @param message сообщение (инфо, ошибка и т.п)
+     */
+    private void showSnack(String message) {
         Snackbar.make(mRecyclerView, message, Snackbar.LENGTH_LONG).show();
     }
 
 
+    /**
+     * Вызывается при уничтожении активити. Освобождает ресурсы.
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
         disposable.dispose();
     }
 
+    /**
+     * Метод используется для установки адреса сервера с настроек
+     * приложения и обращение к серверу для получения данных
+     * прогноза на 5 дней.
+     */
     @Override
     protected void onResume() {
         super.onResume();
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(this);
         String baseUrl = prefs.getString("url_text", "http://192.168.1.106:3000");
-        try{
+        try {
             mAppWeatherService = ServiceUtils.getService(baseUrl);
             //ServiceUtils.setNewUrl(baseUrl);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             showSnack(ex.getMessage());
         }
         sendPostForecast(currentWeather.getCoord());

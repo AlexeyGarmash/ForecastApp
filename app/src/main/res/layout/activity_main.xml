@@ -29,7 +29,7 @@
 
 
     <ProgressBar
-        android:visibility="visible"
+        android:visibility="invisible"
         android:indeterminate="true"
         android:layout_below="@id/toolbarLayout"
         android:id="@+id/progressBarStatus"

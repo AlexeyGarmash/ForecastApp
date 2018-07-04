@@ -21,11 +21,17 @@ import com.example.alex.gismasterapp.models.WeatherCurrentInfo;
 
 import java.util.List;
 
+/**
+ * Класс-адаптер для привязки данных о текущей погоде по местам, загруженным из БД.
+ *
+ * @author Alex
+ * @version 1.0
+ */
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder> {
 
-
-
-
+    /**
+     * Внутренний класс для инициализации View по их ID.
+     */
     public static class HistoryViewHolder extends RecyclerView.ViewHolder {
 
         TextView weatherCity;
@@ -34,6 +40,11 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         ImageView weatherImg;
         RelativeLayout parentLayout;
 
+        /**
+         * Конструктор, выполняющий поиск View по ID в родительском View.
+         *
+         * @param itemView родительский элемент.
+         */
         HistoryViewHolder(View itemView) {
             super(itemView);
 
@@ -49,7 +60,13 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
     private List<WeatherCurrentInfo> cities;
     private Context mContext;
 
-    public HistoryAdapter(List<WeatherCurrentInfo> cities, Context context){
+    /**
+     * Конструктор с параметрами.
+     *
+     * @param cities  список мест и их текущей погоды
+     * @param context контекст MainActivity
+     */
+    public HistoryAdapter(List<WeatherCurrentInfo> cities, Context context) {
         this.cities = cities;
         mContext = context;
     }
@@ -58,6 +75,13 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         return cities;
     }
 
+    /**
+     * Создает новый RecyclerView.ViewHolder и инициализирует некоторые частные поля, которые будут использоваться RecyclerView.
+     *
+     * @param parent   ViewGroup, в которую будет добавлен новый View после привязки к позиции адаптера
+     * @param viewType тип представления нового View
+     * @return
+     */
     @NonNull
     @Override
     public HistoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -66,6 +90,12 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         return vHolder;
     }
 
+    /**
+     * Этот метод должен обновлять содержимое itemView, чтобы отразить элемент в данной позиции.
+     *
+     * @param holder   ViewHolder, который должен быть обновлен для представления содержимого элемента в данной позиции в наборе данных
+     * @param position Позиция элемента в наборе данных адаптера
+     */
     @Override
     public void onBindViewHolder(@NonNull HistoryViewHolder holder, final int position) {
 
@@ -77,7 +107,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, ForecastActivity.class);
-                intent.putExtra(MainActivity.LAT_LON_ADDRESS_DATA,cities.get(position));
+                intent.putExtra(MainActivity.LAT_LON_ADDRESS_DATA, cities.get(position));
                 mContext.startActivity(intent);
             }
         });
@@ -87,7 +117,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
                 OptionsBottomSheetFragment bottomSheetFragment = new OptionsBottomSheetFragment();
                 bottomSheetFragment.setHistoryAdapter(getThis());
                 bottomSheetFragment.setIndex(position);
-                bottomSheetFragment.show(((MainActivity)mContext).getSupportFragmentManager(), bottomSheetFragment.getTag());
+                bottomSheetFragment.show(((MainActivity) mContext).getSupportFragmentManager(), bottomSheetFragment.getTag());
                 //Toast.makeText(mContext, cities.get(position).getCoord().getId(), Toast.LENGTH_SHORT).show();
                 return false;
             }
@@ -98,15 +128,26 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
         return mContext;
     }
 
-    private HistoryAdapter getThis(){
+
+    private HistoryAdapter getThis() {
         return this;
     }
 
+    /**
+     * Возвращает общее количество элементов в наборе данных, хранящемся в адаптере.
+     *
+     * @return размер набора данных.
+     */
     @Override
     public int getItemCount() {
         return cities.size();
     }
 
+    /**
+     * Вызывается RecyclerView, когда он начинает наблюдать за этим адаптером.
+     *
+     * @param recyclerView экземпляр RecyclerView, который начал наблюдать за этим адаптером
+     */
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);

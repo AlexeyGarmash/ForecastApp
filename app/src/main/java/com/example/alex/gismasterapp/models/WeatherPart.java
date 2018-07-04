@@ -7,8 +7,10 @@ import com.example.alex.gismasterapp.R;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class WeatherPart implements Parcelable
-{
+/**
+ * Класс-модель, содержащий погодную состовляющую {@link WeatherCurrentInfo} и {@link WeatherInfo}
+ */
+public class WeatherPart implements Parcelable {
 
     @SerializedName("descrip")
     @Expose
@@ -42,8 +44,7 @@ public class WeatherPart implements Parcelable
             return (new WeatherPart[size]);
         }
 
-    }
-            ;
+    };
 
     protected WeatherPart(Parcel in) {
         this.descrip = ((String) in.readValue((String.class.getClassLoader())));
@@ -69,11 +70,11 @@ public class WeatherPart implements Parcelable
         return tempr;
     }
 
-    public long getTemprInt(){
+    public long getTemprInt() {
         return Math.round(tempr);
     }
 
-    public String getFormatedTemp(){
+    public String getFormatedTemp() {
         return String.format("%s \u2103", String.valueOf(Math.round(tempr)));
     }
 
@@ -85,7 +86,7 @@ public class WeatherPart implements Parcelable
         return hum;
     }
 
-    public String getFormatedHumidity(){
+    public String getFormatedHumidity() {
         return String.valueOf(hum) + "%";
     }
 
@@ -106,17 +107,26 @@ public class WeatherPart implements Parcelable
     }
 
     //["С", "СВ", "В", "ЮВ", "Ю", "ЮЗ", "Ю", "СЗ", "С"];
-    public int getWindResource(){
-        switch (getDirectWind()){
-            case "С": return R.drawable.to_south;
-            case "СВ": return R.drawable.to_south_west;
-            case "СЗ": return R.drawable.to_south_east;
-            case "Ю": return R.drawable.to_north;
-            case "ЮВ": return R.drawable.to_north_west;
-            case "ЮЗ": return R.drawable.to_north_east;
-            case "З": return R.drawable.to_east;
-            case "В": return R.drawable.to_west;
-            default: return 0;
+    public int getWindResource() {
+        switch (getDirectWind()) {
+            case "С":
+                return R.drawable.to_south;
+            case "СВ":
+                return R.drawable.to_south_west;
+            case "СЗ":
+                return R.drawable.to_south_east;
+            case "Ю":
+                return R.drawable.to_north;
+            case "ЮВ":
+                return R.drawable.to_north_west;
+            case "ЮЗ":
+                return R.drawable.to_north_east;
+            case "З":
+                return R.drawable.to_east;
+            case "В":
+                return R.drawable.to_west;
+            default:
+                return 0;
         }
 
     }

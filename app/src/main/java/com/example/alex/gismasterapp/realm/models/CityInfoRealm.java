@@ -1,12 +1,14 @@
 package com.example.alex.gismasterapp.realm.models;
 
 
-
 import com.example.alex.gismasterapp.models.CityInfo;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
+/**
+ * Класс-модель (копия) {@link CityInfo} для хранения в БД {@link io.realm.Realm}
+ */
 public class CityInfoRealm extends RealmObject {
 
     @PrimaryKey
@@ -94,7 +96,7 @@ public class CityInfoRealm extends RealmObject {
         this.address = address;
     }
 
-    public CityInfo getCityInfo(){
+    public CityInfo getCityInfo() {
         CityInfo cityInfo = new CityInfo();
         cityInfo.setAddress(address);
         cityInfo.setCityName(cityName);

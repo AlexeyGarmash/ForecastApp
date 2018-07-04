@@ -26,7 +26,7 @@
     </string>
 
     <string name="pref_title_display_url">Адрес сервера</string>
-    <string name="pref_default_display_url">http://192.168.1.106:3000</string>
+    <string name="pref_default_display_url">http://46.119.9.114:3000</string>
 
     <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
     <string-array name="pref_example_list_titles">

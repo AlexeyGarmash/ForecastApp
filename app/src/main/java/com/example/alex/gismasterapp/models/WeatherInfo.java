@@ -1,5 +1,8 @@
 package com.example.alex.gismasterapp.models;
 
+/**
+ * Класс-модель информации о прогнозе погоды в заданном месте.
+ */
 public class WeatherInfo {
     private String timeShort;
 
@@ -20,47 +23,37 @@ public class WeatherInfo {
     }
 
 
-
-    public String getTimeShort ()
-    {
+    public String getTimeShort() {
         return timeShort;
     }
 
-    public void setTimeShort (String timeShort)
-    {
+    public void setTimeShort(String timeShort) {
         this.timeShort = timeShort;
     }
 
 
-    public String getDateShort ()
-    {
+    public String getDateShort() {
         return dateShort;
     }
 
-    public void setDateShort (String dateShort)
-    {
+    public void setDateShort(String dateShort) {
         this.dateShort = dateShort;
     }
 
 
-
-    public String getDayWeek ()
-    {
+    public String getDayWeek() {
         return dayWeek;
     }
 
-    public void setDayWeek (String dayWeek)
-    {
+    public void setDayWeek(String dayWeek) {
         this.dayWeek = dayWeek;
     }
 
-    public String getDatetime ()
-    {
+    public String getDatetime() {
         return datetime;
     }
 
-    public void setDatetime (String datetime)
-    {
+    public void setDatetime(String datetime) {
         this.datetime = datetime;
     }
 
