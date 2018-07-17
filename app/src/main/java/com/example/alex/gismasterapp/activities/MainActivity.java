@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
     private List<WeatherCurrentInfo> currentInfos;
 
 
-    public static final int MY_PERMISSIONS_REQUEST_READ_MEDIA = 1;
+    
 
     /**
      * Метод используется при создании активити
